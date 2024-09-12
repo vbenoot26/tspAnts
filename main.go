@@ -46,7 +46,7 @@ func initAnts() {
 }
 
 func doRandomTours() {
-	for i := 0; i < GRAPH_SIZE; i++ {
+	for i := 1; i < GRAPH_SIZE; i++ {
 		for ant := 0; ant < ANTS_AMOUNT; ant++ {
 			pickNextCity(ant, i)
 		}
