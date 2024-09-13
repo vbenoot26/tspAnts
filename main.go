@@ -18,7 +18,7 @@ const (
 var (
 	graph      Graph
 	pheromones Graph
-	antPaths   [ANTS_AMOUNT][GRAPH_SIZE]uint
+	antPaths   [ANTS_AMOUNT][GRAPH_SIZE]int
 )
 
 type Graph [GRAPH_SIZE][GRAPH_SIZE]float64
@@ -26,8 +26,6 @@ type Graph [GRAPH_SIZE][GRAPH_SIZE]float64
 func main() {
 	initGraph()
 	initAnts()
-
-	doRandomTours()
 
 	for _, path := range antPaths {
 		fmt.Println(path)
@@ -48,15 +46,7 @@ func initGraph() {
 // Puts one ant every node since amount of ants == graph size
 func initAnts() {
 	for i := 0; i < ANTS_AMOUNT; i++ {
-		antPaths[i][0] = uint(i)
-	}
-}
-
-func doRandomTours() {
-	for i := 1; i < GRAPH_SIZE; i++ {
-		for ant := 0; ant < ANTS_AMOUNT; ant++ {
-			pickNextNode(ant, i)
-		}
+		antPaths[i][0] = i
 	}
 }
 
@@ -64,31 +54,11 @@ func calculate() {
 	for ant := range antPaths {
 		for step := 1; step < GRAPH_SIZE; step++ {
 			distribution := getProbabilityDistribution(ant, step)
-			antPaths[ant][step] = uint(pickIndex(distribution[:]))
+			antPaths[ant][step] = pickIndex(distribution[:])
 		}
 	}
 
 	updatePheromone()
-}
-
-func pickNextNode(ant int, step int) {
-	for true {
-		maybenode := uint(rand.Intn(GRAPH_SIZE))
-		alreadyVisited := false
-		for nodeIdx := 0; nodeIdx < step; nodeIdx++ {
-			if antPaths[ant][nodeIdx] == maybenode {
-				alreadyVisited = true
-				break
-			}
-		}
-
-		if alreadyVisited {
-			continue
-		}
-
-		antPaths[ant][step] = maybenode
-		break
-	}
 }
 
 func getProbabilityDistribution(ant int, step int) [GRAPH_SIZE]float64 {
@@ -97,7 +67,7 @@ func getProbabilityDistribution(ant int, step int) [GRAPH_SIZE]float64 {
 	lastNode := antPaths[ant][step-1]
 
 	for node := 0; node < GRAPH_SIZE; node++ {
-		if contains(antPaths[ant][:step], uint(node)) {
+		if contains(antPaths[ant][:step], node) {
 			numerators[node] = 0
 		} else {
 			numerators[node] = math.Pow(pheromones[lastNode][node], HEURISTIC_IMPORTANCE) * math.Pow(graph[lastNode][node], PHEROMONE_IMPORTANCE)
@@ -127,10 +97,34 @@ func pickIndex(probablities []float64) int {
 }
 
 func updatePheromone() {
-	// TODO: impelement
+	// Decay
+	for i, row := range pheromones {
+		for j := range row {
+			pheromones[i][j] *= 1 - DECAY
+		}
+	}
+
+	// Delta
+	for _, path := range antPaths {
+		// calculate tour length
+		tourLength := getPathLength(path[:])
+
+		for idx := range path {
+			pheromones[path[idx]][path[(idx+1)%len(path)]] += 1 / tourLength
+		}
+	}
 }
 
-func contains(targetSlice []uint, value uint) bool {
+func getPathLength(path []int) float64 {
+	tourLength := 0.0
+	for idx := range path {
+		tourLength += graph[path[idx]][path[(idx+1)%len(path)]]
+	}
+
+	return tourLength
+}
+
+func contains(targetSlice []int, value int) bool {
 	for _, element := range targetSlice {
 		if element == value {
 			return true
