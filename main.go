@@ -7,11 +7,12 @@ import (
 )
 
 const (
-	GRAPH_SIZE  = 5
-	ANTS_AMOUNT = GRAPH_SIZE
-	ITERATIONS  = 10
-	ALPHA       = 0.9
-	BETA        = 1.5
+	GRAPH_SIZE           = 5
+	ANTS_AMOUNT          = GRAPH_SIZE
+	ITERATIONS           = 10
+	HEURISTIC_IMPORTANCE = 0.9
+	PHEROMONE_IMPORTANCE = 1.5
+	DECAY                = 0.9
 )
 
 var (
@@ -99,7 +100,7 @@ func getProbabilityDistribution(ant int, step int) [GRAPH_SIZE]float64 {
 		if contains(antPaths[ant][:step], uint(node)) {
 			numerators[node] = 0
 		} else {
-			numerators[node] = math.Pow(pheromones[lastNode][node], ALPHA) * math.Pow(graph[lastNode][node], BETA)
+			numerators[node] = math.Pow(pheromones[lastNode][node], HEURISTIC_IMPORTANCE) * math.Pow(graph[lastNode][node], PHEROMONE_IMPORTANCE)
 			possibilityUniverse += numerators[node]
 		}
 	}
