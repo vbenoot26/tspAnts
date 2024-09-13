@@ -9,7 +9,7 @@ import (
 const (
 	GRAPH_SIZE           = 5
 	ANTS_AMOUNT          = GRAPH_SIZE
-	ITERATIONS           = 10
+	ITERATIONS           = 100
 	HEURISTIC_IMPORTANCE = 0.9
 	PHEROMONE_IMPORTANCE = 1.5
 	DECAY                = 0.9
@@ -19,6 +19,8 @@ var (
 	graph      Graph
 	pheromones Graph
 	antPaths   [ANTS_AMOUNT][GRAPH_SIZE]int
+	bestTour   [GRAPH_SIZE]int
+	bestCost   = 1000000000.0
 )
 
 type Graph [GRAPH_SIZE][GRAPH_SIZE]float64
@@ -27,9 +29,23 @@ func main() {
 	initGraph()
 	initAnts()
 
-	for _, path := range antPaths {
-		fmt.Println(path)
+	for i := 0; i < ITERATIONS; i++ {
+		calculate()
+
+		// See if there is a better path
+		for _, path := range antPaths {
+			pathCost := getPathLength(path[:])
+			if pathCost < bestCost {
+				bestCost = pathCost
+				for i := range path {
+					bestTour[i] = path[i]
+				}
+			}
+		}
 	}
+
+	fmt.Println(bestTour)
+	fmt.Println(bestCost)
 }
 
 // Initialises a random graph.
