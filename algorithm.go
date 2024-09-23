@@ -9,7 +9,7 @@ var (
 	pheromones Graph
 	antPaths   [ANTS_AMOUNT][GRAPH_SIZE]int
 	bestTour   [GRAPH_SIZE]int
-	bestCost   = 1000000000.0
+	bestCost   = 1000000000.0 // Very big number as an infinity.
 )
 
 func findTour(graph Graph) [GRAPH_SIZE]int {
@@ -28,6 +28,8 @@ func findTour(graph Graph) [GRAPH_SIZE]int {
 				}
 			}
 		}
+
+		saveState(pheromones, antPaths)
 	}
 
 	return bestTour
