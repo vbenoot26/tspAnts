@@ -22,6 +22,7 @@ type Graph [GRAPH_SIZE][GRAPH_SIZE]float64
 
 func main() {
 	initGraph()
+	printGraph()
 	tour := findTour(cities)
 	fmt.Println(tour)
 	fmt.Println(bestCost)
@@ -29,6 +30,7 @@ func main() {
 
 // Initialises a random graph.
 func initGraph() {
+	// the graph itself
 	for i := 0; i < GRAPH_SIZE; i++ {
 		for j := 0; j <= i; j++ {
 			if i == j {
@@ -39,5 +41,18 @@ func initGraph() {
 				cities[j][i] = edgeweigth
 			}
 		}
+	}
+	// the pheromones
+	for i := 0; i < GRAPH_SIZE; i++ {
+		for j := 0; j < GRAPH_SIZE; j++ {
+			pheromones[i][j] = 1
+		}
+	}
+}
+
+// DEBUGTOOLS ------------------------------------
+func printGraph() {
+	for i := 0; i < GRAPH_SIZE; i++ {
+		fmt.Println(cities[i])
 	}
 }

@@ -61,7 +61,7 @@ func getProbabilityDistribution(ant int, step int) [GRAPH_SIZE]float64 {
 	lastNode := antPaths[ant][step-1]
 
 	for node := 0; node < GRAPH_SIZE; node++ {
-		if contains(antPaths[ant][:step+1], node) {
+		if contains(antPaths[ant][:step], node) {
 			numerators[node] = 0
 		} else {
 			numerators[node] = math.Pow(pheromones[lastNode][node], HEURISTIC_IMPORTANCE) * math.Pow(cities[lastNode][node], PHEROMONE_IMPORTANCE)
